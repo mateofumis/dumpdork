@@ -12,19 +12,31 @@ DumpDork is a powerful command-line tool for performing Google dorking, allowing
 
 ## Installation
 
-1. **Clone the repository**:
+### Manual:
+
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/mateofumis/dumpdork.git
 cd dumpdork
 ```
 
-Set up a virtual environment (optional but recommended):
+2. Set up a virtual environment (optional but recommended):
 
 ```bash
 python3 -m venv env
 source env/bin/activate  # On Windows use `.\env\Scripts\activate`
 ```
+
+### Using pip install
+
+1. Install dumpdork with pip3
+
+```bash
+pip3 install dumpdork --upgrade
+```
+
+See this project in PyPi: [https://pypi.org/project/dumpdork/](https://pypi.org/project/dumpdork/) 
 
 ## Install dependencies:
 
