@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='dumpdork',
-    version='0.1.0',
+    version='0.1.2',
     packages=find_packages(),
     install_requires=[
         'colorama==0.4.6',
@@ -22,7 +22,7 @@ setup(
     author_email='mateofumis1@gmail.com',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: Apache license 2.0',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.6',
