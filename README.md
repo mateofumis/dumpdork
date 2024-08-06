@@ -1,4 +1,4 @@
-# DumpDork
+# 🔍 DumpDork
 
 DumpDork is a powerful command-line tool for performing Google dorking, allowing users to uncover hidden information and vulnerabilities using advanced search queries directly from the terminal.
 
