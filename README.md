@@ -89,6 +89,7 @@ python3 dumpdork.py 'inurl:login (ext:php | ext:asp | ext:aspx | ext:aspxh)' --o
 ## License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-Contributing
+
+## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue.
