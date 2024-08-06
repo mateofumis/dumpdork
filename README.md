@@ -55,10 +55,21 @@ rapidapi:
 
 ## Usage
 
-To use DumpDork, run the following command in your terminal:
-
 ```bash
-python3 dumpdork.py 'your search query' --limit 100 --output results.json --config-file config.yaml
+$: dumpdork -h
+usage: dumpdork [-h] [--limit LIMIT] [--output OUTPUT] --config-file CONFIG_FILE [query]
+
+Perform a search using RapidAPI.
+
+positional arguments:
+  query                 The search query.
+
+options:
+  -h, --help            show this help message and exit
+  --limit LIMIT         Number of results to return (default is 50).
+  --output OUTPUT       Output file to save results in JSON format.
+  --config-file CONFIG_FILE
+                        Path to the YAML config file containing API credentials.
 ```
 
 Example Queries
