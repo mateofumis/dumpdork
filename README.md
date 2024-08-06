@@ -53,6 +53,12 @@ rapidapi:
   key: "YOUR_RAPIDAPI_KEY"
 ```
 
+### How to get your credentials
+
+1. Visit [https://rapidapi.com/](https://rapidapi.com/) and create an account or login.
+2. Once logged in, visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and claim your FREE API credentials
+3. Done! Now you can fill your `config.yaml` with your own credentials.
+
 ## Usage
 
 ```bash
