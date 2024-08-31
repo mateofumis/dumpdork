@@ -73,7 +73,9 @@ def print_help():
 def wizard_setup():
     print(f"{Fore.YELLOW}Welcome to the API Key Setup Wizard!")
     print("1. Signup at: https://rapidapi.com/herosAPI/api/google-search74/playground")
-    print("2. Subscribe for free and copy the API key.")
+    print("2. Subscribe for Free to get the API key.")
+    print("Visit https://rapidapi.com/auth/login and create an account or login.")
+# 2. Once logged in, visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and claim your FREE API credentials
 
     key = input("Enter your RapidAPI key: ").strip()
     if not key:
