@@ -2,7 +2,7 @@
 
 DumpDork is a powerful command-line tool for performing Google dorking, allowing users to uncover hidden information and vulnerabilities using advanced search queries directly from the terminal.
 
-![preview](preview.gif)
+![preview](https://raw.githubusercontent.com/mateofumis/dumpdork/main/preview.gif)
 
 ## Features
 
@@ -11,6 +11,7 @@ DumpDork is a powerful command-line tool for performing Google dorking, allowing
 - **Output Options**: Save your findings in a neatly formatted JSON file for further analysis or reporting.
 - **No CAPTCHA Required**: This script does not require users to complete CAPTCHA, making it easier to retrieve results without interruptions.
 - **Configurable Credentials**: Manage your API credentials securely through a simple YAML configuration file.
+- **Interactive Setup Wizard**: With an user-friendly wizard which guides you through the setup process, helping you configure your API credentials settings step-by-step.
 
 ## Installation
 
@@ -30,42 +31,43 @@ python3 -m venv env
 source env/bin/activate  # On Windows use `.\env\Scripts\activate`
 ```
 
-### Using pip install
-
-1. Install dumpdork with pip3
-
-```bash
-pip3 install dumpdork --upgrade
-```
-
-See this project in PyPi: [https://pypi.org/project/dumpdork/](https://pypi.org/project/dumpdork/) 
-
-## Install dependencies:
+3. Install dependencies:
 
 ```bash
 pip3 install -r requirements.txt
 ```
 
-Configure your API credentials:
-Create a config.yaml file in the root directory with the following structure:
+### Using pip install
+
+1. Install dumpdork with pip3
+
+```bash
+pip3 install dumpdork
+```
+
+See this project in PyPi: [https://pypi.org/project/dumpdork/](https://pypi.org/project/dumpdork/) 
+
+## Configure your API credentials:
+
+Create config.yaml file in `~/.config/dumpdork/config.yaml` with the following structure:
 
 ```yaml
 rapidapi:
-  host: "YOUR_RAPIDAPI_HOST"
+  host: google-search74.p.rapidapi.com
   key: "YOUR_RAPIDAPI_KEY"
 ```
 
 ### How to get your credentials
 
-1. Visit [https://rapidapi.com/](https://rapidapi.com/) and create an account or login.
-2. Once logged in, visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and claim your FREE API credentials
+1. Visit [https://rapidapi.com/auth/login/](https://rapidapi.com/auth/login/) and create an account or sign in.
+2. Once logged in, visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and claim your FREE API credentials.
 3. Done! Now you can fill your `config.yaml` with your own credentials.
 
 ## Usage
 
 ```bash
 $: dumpdork -h
-usage: dumpdork [-h] [--limit LIMIT] [--output OUTPUT] --config-file CONFIG_FILE [query]
+usage: dumpdork.py [-h] [--limit LIMIT] [--output OUTPUT] [--config-file CONFIG_FILE] [--wizard] [query]
 
 Perform a search using RapidAPI.
 
@@ -74,10 +76,11 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  --limit LIMIT         Number of results to return (default is 50).
+  --limit LIMIT         Number of results to return (default is 50. Limit: 300).
   --output OUTPUT       Output file to save results in JSON format.
   --config-file CONFIG_FILE
                         Path to the YAML config file containing API credentials.
+  --wizard              Set up your API key for dumpdork, step by step with easy.
 ```
 
 Example Queries
