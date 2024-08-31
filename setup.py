@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='dumpdork',
-    version='0.1.4',
+    version='0.1.4.post1',
     packages=find_packages(),
     install_requires=[
         'colorama==0.4.6',
