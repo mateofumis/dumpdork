@@ -78,20 +78,19 @@ rapidapi:
 $: dumpdork
 🔍 Welcome to DumpDork !!
 
-Usage: dumpdork 'query' [--limit number] [--output filename.json] [--custom-config-file config.yaml]
+Usage: dumpdork 'query' [--limit number] [--output filename.json] [--config-file config.yaml]
 
 Options:
   query                 The search query.
   --limit               Number of results to return (default is 50. Limit: 300).
   --output              Output file to save results in JSON format.
-  --custom-config-file CUSTOM_CONFIG_FILE
-			Path to custom YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml
+  --config-file         Path to custom YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml
   --wizard              Set up your API key for dumpdork, step by step with easy.
 
 📋 Examples:
     $: dumpdork 'site:*.example.com AND (intext:"aws_access_key_id" | intext:"aws_secret_access_key" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json
     $: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:"/login" | inurl:"/signup" | inurl:"/admin" | inurl:"/register") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json
-    $: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --custom-config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
+    $: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
 ```
 
 Example Queries
@@ -111,7 +110,7 @@ $: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:"/login"
 - Search for Sensitive Files or Logs:
 
 ```bash
-$: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --custom-config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
+$: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
 ```
 
 - Take a look at **GHDB** for more Dorks: [https://www.exploit-db.com/google-hacking-database](https://www.exploit-db.com/google-hacking-database)
