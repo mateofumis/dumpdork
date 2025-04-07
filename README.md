@@ -2,6 +2,11 @@
 
 DumpDork is a powerful command-line tool for performing Google dorking, allowing users to uncover hidden information and vulnerabilities using advanced search queries directly from the terminal.
 
+![GitHub Release](https://img.shields.io/github/v/release/mateofumis/dumpdork)
+![GitHub License](https://img.shields.io/github/license/mateofumis/dumpdork)
+![PyPI - Version](https://img.shields.io/pypi/v/dumpdork)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/dumpdork)
+
 ![preview](https://raw.githubusercontent.com/mateofumis/dumpdork/main/preview.gif)
 
 ## Features
@@ -37,12 +42,14 @@ source env/bin/activate  # On Windows use `.\env\Scripts\activate`
 pip3 install -r requirements.txt
 ```
 
-### Using pip install
+### Using pip/pipx install
 
 1. Install dumpdork with pip3
 
 ```bash
 pip3 install dumpdork
+# or as well with pipx
+pipx install dumpdork
 ```
 
 See this project in PyPi: [https://pypi.org/project/dumpdork/](https://pypi.org/project/dumpdork/) 
@@ -63,39 +70,51 @@ rapidapi:
 2. Once logged in, visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and claim your FREE API credentials.
 3. Done! Now you can fill your `config.yaml` with your own credentials.
 
+**[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/blob/main/API_SETUP_GUIDE.md**
+
 ## Usage
 
-```bash
-$: dumpdork -h
-usage: dumpdork.py [-h] [--limit LIMIT] [--output OUTPUT] [--config-file CONFIG_FILE] [--wizard] [query]
+```
+$: dumpdork
+🔍 Welcome to DumpDork !!
 
-Perform a search using RapidAPI.
+Usage: dumpdork 'query' [--limit number] [--output filename.json] [--custom-config-file config.yaml]
 
-positional arguments:
+Options:
   query                 The search query.
-
-options:
-  -h, --help            show this help message and exit
-  --limit LIMIT         Number of results to return (default is 50. Limit: 300).
-  --output OUTPUT       Output file to save results in JSON format.
-  --config-file CONFIG_FILE
-                        Path to the YAML config file containing API credentials.
+  --limit               Number of results to return (default is 50. Limit: 300).
+  --output              Output file to save results in JSON format.
+  --custom-config-file CUSTOM_CONFIG_FILE
+			Path to custom YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml
   --wizard              Set up your API key for dumpdork, step by step with easy.
+
+📋 Examples:
+    $: dumpdork 'site:*.example.com AND (intext:"aws_access_key_id" | intext:"aws_secret_access_key" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json
+    $: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:"/login" | inurl:"/signup" | inurl:"/admin" | inurl:"/register") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json
+    $: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --custom-config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
 ```
 
 Example Queries
 
-- Search for PHP files on HackerOne:
+- Search for AWS Leaked Credentials:
 
 ```bash
-python3 dumpdork.py 'site:"*.hackerone.com" ext:php' --output h1_results.json --limit 100 --config-file config.yaml
+$: dumpdork 'site:*.example.com AND (intext:"aws_access_key_id" | intext:"aws_secret_access_key" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json
 ```
 
-- Find login pages:
+- Find SQL Injection Endpoints Forms:
 
 ```bash
-python3 dumpdork.py 'inurl:login (ext:php | ext:asp | ext:aspx | ext:aspxh)' --output juicy_results.json --config-file config.yaml
+$: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:"/login" | inurl:"/signup" | inurl:"/admin" | inurl:"/register") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json
 ```
+
+- Search for Sensitive Files or Logs:
+
+```bash
+$: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --custom-config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
+```
+
+- Take a look at **GHDB** for more Dorks: [https://www.exploit-db.com/google-hacking-database](https://www.exploit-db.com/google-hacking-database)
 
 ## License
 
@@ -105,6 +124,10 @@ This project is licensed under the Apache License 2.0 - see the LICENSE file for
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue.
 
-## 🧡 Support me with a virtual Coffee! 🧡
+## Support me with a virtual Coffee! ❤️
 
-[![Ko-Fi](https://storage.ko-fi.com/cdn/brandasset/kofi_button_stroke.png)](https://ko-fi.com/hackermater)
+If you find this tool useful, consider supporting me with a coffee!
+
+<a href="https://ko-fi.com/hackermater">
+    <img src="https://storage.ko-fi.com/cdn/brandasset/kofi_button_stroke.png" alt="Ko-Fi" width="400" />
+</a>
