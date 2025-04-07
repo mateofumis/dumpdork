@@ -20,7 +20,7 @@
 ```bash
 $: dumpdork --wizard
 Welcome to the API Key Setup Wizard!
-[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/API_SETUP_GUIDE.md
+[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/blob/main/API_SETUP_GUIDE.md
 1. Signup at: https://rapidapi.com/herosAPI/api/google-search74/playground
 2. Subscribe for free and copy the API key.
 Enter your RapidAPI key:
