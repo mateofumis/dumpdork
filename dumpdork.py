@@ -58,24 +58,26 @@ def rapidapi_search(query, limit, key):
         return None
 
 def print_help():
-    print(f"{Fore.YELLOW}Usage: python3 dumpdork.py 'query' [--limit number] [--output filename.json] [--config-file config.yaml]")
-    print(f"{Fore.YELLOW}Options:")
-    print(f"  query                 The search query.")
-    print(f"  --limit               Number of results to return (default is 50. Limit: 300).")
-    print(f"  --output              Output file to save results in JSON format.")
-    print(f"  --config-file         Path to the YAML config file containing API credentials.")
-    print(f"  --wizard              Set up your API key for dumpdork, step by step with easy.")
-    print(f"{Fore.YELLOW}Example:")
-    print(f"  python3 dumpdork.py 'site:\"*.hackerone.com\" ext:php' --output h1_results.json --limit 100 --config-file config.yaml")
-    print(f"  python3 dumpdork.py 'inurl:login (ext:php | ext:asp | ext:aspx | ext:aspxh)' --output juicy_results.json --config-file config.yaml")
-    print(f"  python3 dumpdork.py 'intitle:\"Index of /\" | intitle:\"index of\" | intitle:\"Directory listing\"' --config-file config.yaml")
+    print("🔍 Welcome to DumpDork !!")
+    print("\nUsage: dumpdork 'query' [--limit number] [--output filename.json] [--config-file config.yaml]")
+    print("\nOptions:")
+    print("  query                 The search query.")
+    print("  --limit               Number of results to return (default is 50. Limit: 300).")
+    print("  --output              Output file to save results in JSON format.")
+    print("  --config-file         Path to custom YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml")
+    print("  --wizard              Set up your API key for dumpdork, step by step with easy.")
+    print("\n📋 Examples:")
+    print("    $: dumpdork 'site:*.example.com AND (intext:\"aws_access_key_id\" | intext:\"aws_secret_access_key\" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json ")
+    print("    $: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:\"/login\" | inurl:\"/signup\" | inurl:\"/admin\" | inurl:\"/register\") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json")
+    print("    $: dumpdork 'site:*.example.com AND (intitle:\"Index of /\" | intitle:\"index of\") AND (intext:\".log\" | intext:\".sql\" | intext:\".txt\" | intext:\".sh\")' --config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json")
 
 def wizard_setup():
     print(f"{Fore.YELLOW}Welcome to the API Key Setup Wizard!")
-    print("1. Signup at: https://rapidapi.com/herosAPI/api/google-search74/playground")
+    print(f"\033[1m[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/blob/main/API_SETUP_GUIDE.md")
+    print("1. Sign up at: https://rapidapi.com/herosAPI/api/google-search74/playground")
     print("2. Subscribe for free and copy the API key.")
 
-    key = input("Enter your RapidAPI key: ").strip()
+    key = input(f"\033[1mEnter your RapidAPI key: ").strip()
     if not key:
         print(f"{Fore.RED}Error: API key cannot be empty.")
         sys.exit(1)
@@ -83,17 +85,17 @@ def wizard_setup():
     save_config(CONFIG_FILE, key)
 
 def main():
-    parser = argparse.ArgumentParser(description='Perform a search using RapidAPI.')
+    parser = argparse.ArgumentParser(description='Perform a search using Google Dorks')
     parser.add_argument('query', nargs='?', type=str, help='The search query.')
     parser.add_argument('--limit', type=int, default=50, help='Number of results to return (default is 50. Limit: 300).')
     parser.add_argument('--output', type=str, help='Output file to save results in JSON format.')
-    parser.add_argument('--config-file', type=str, default=CONFIG_FILE, help='Path to the YAML config file containing API credentials.')
+    parser.add_argument('--config-file', type=str, default=CONFIG_FILE, help='Path to the YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml')
     parser.add_argument('--wizard', action='store_true', help='Set up your API key for dumpdork, step by step with easy.')
 
     args = parser.parse_args()
 
     if args.limit > 300:
-        print(f"{Fore.RED}Error: Maximum limit allowed is 300.")
+        print(f"{Fore.RED}Error: Maximum limit allowed for the API is 300.")
         sys.exit(1)
 
     if args.wizard:
