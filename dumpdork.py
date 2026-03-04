@@ -66,6 +66,23 @@ def save_config(config_file, keys_dict):
         yaml.dump(config, file, default_flow_style=False)
     print(f"{Fore.GREEN}Configuration saved to '{config_file}'")
 
+def get_github_commits(repo_full_name, key, limit=3):
+    url = f"https://api.github.com/repos/{repo_full_name}/commits"
+    headers = {
+        'Accept': "application/vnd.github.v3+json",
+        'User-Agent': 'DumpDork-Tool'
+    }
+    if key and key.strip() != "" and key != "Not configured":
+        headers['Authorization'] = f"token {key}"
+
+    try:
+        response = requests.get(url, headers=headers, params={'per_page': limit})
+        if response.status_code == 200:
+            return response.json()
+    except:
+        pass
+    return []
+
 def perform_search(source, query, limit, key):
     if source not in PROVIDERS:
         return None
@@ -81,7 +98,7 @@ def perform_search(source, query, limit, key):
             headers['Authorization'] = f"token {key}"
         headers['Accept'] = "application/vnd.github.v3+json"
         headers['User-Agent'] = 'DumpDork-Tool'
-        
+
     elif source == "google":
         url = provider["url_pattern"]
         params = {'query': query, 'limit': limit}
@@ -97,7 +114,7 @@ def perform_search(source, query, limit, key):
             'x-rapidapi-host': provider["host"],
             'x-rapidapi-key': key
         }
-    
+
     try:
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
@@ -114,7 +131,7 @@ def perform_search(source, query, limit, key):
 
 def wizard_setup():
     print(f"{Fore.YELLOW}{Style.BRIGHT}Welcome to the DumpDork API Setup Wizard!")
-    
+
     keys_dict = {}
     if os.path.exists(CONFIG_FILE):
         try:
@@ -129,18 +146,18 @@ def wizard_setup():
             print("Using official GitHub API (api.github.com)")
         else:
             print(f"RapidAPI Host: {PROVIDERS[source]['host']}")
-        
+
         current_key = keys_dict.get(source, "Not configured")
         print(f"Current Key: {current_key}")
-        
+
         prompt = f"Enter API key/token for {source} (leave blank to skip): "
         new_key = input(prompt).strip()
-        
+
         if new_key.lower() == 'clear':
             keys_dict[source] = ""
         elif new_key:
             keys_dict[source] = new_key
-    
+
     save_config(CONFIG_FILE, keys_dict)
 
 def main():
@@ -182,22 +199,47 @@ def main():
 
     if results:
         items = []
-        if args.source == "brave":
-            items = results.get('results', []) or results.get('web', {}).get('results', [])
-        elif args.source == "github":
+        if args.source == "github":
             items = results.get('items', [])
+        elif args.source == "brave":
+            items = results.get('results', []) or results.get('web', {}).get('results', [])
         else: # Google
             items = results.get('results', [])
 
         for item in items:
-            title = item.get('title') or item.get('full_name') or 'No Title'
-            url = item.get('url') or item.get('html_url') or item.get('link') or 'No URL'
-            desc = item.get('description') or item.get('snippet') or 'No Description'
+            if args.source == "github":
+                full_name = item.get('full_name') or 'No Name'
+                url = item.get('html_url') or 'No URL'
+                desc = item.get('description') or 'No Description'
+                owner = item.get('owner', {}).get('login', 'Unknown')
 
-            print(f"{Fore.CYAN}Title: {Style.BRIGHT}{title}")
-            print(f"{Fore.GREEN}URL: {Style.BRIGHT}{urllib.parse.unquote(url)}")
-            print(f"{Fore.MAGENTA}Description: {Style.BRIGHT}{desc}\n")
-        
+                if desc and len(desc) > 150:
+                    desc = desc[:147] + "..."
+
+                print(f"{Fore.CYAN}Repo: {Style.BRIGHT}{full_name} ({Fore.WHITE}by @{owner}{Fore.CYAN})")
+                print(f"{Fore.GREEN}URL: {Style.BRIGHT}{urllib.parse.unquote(url)}")
+                print(f"{Fore.MAGENTA}Description: {Style.BRIGHT}{desc}")
+
+                commits = get_github_commits(full_name, api_key)
+                if commits:
+                    print(f"{Fore.YELLOW}Recent Commits:")
+                    for c in commits:
+                        msg = c.get('commit', {}).get('message', '').split('\n')[0]
+                        date = c.get('commit', {}).get('author', {}).get('date', '')[:10]
+                        print(f"  {Fore.WHITE}- [{date}] {msg[:80]}")
+                print("")
+            else:
+                title = item.get('title') or 'No Title'
+                url = item.get('url') or item.get('link') or 'No URL'
+                desc = item.get('description') or item.get('snippet') or 'No Description'
+
+                if desc and len(desc) > 150:
+                    desc = desc[:147] + "..."
+
+                print(f"{Fore.CYAN}Title: {Style.BRIGHT}{title}")
+                print(f"{Fore.GREEN}URL: {Style.BRIGHT}{urllib.parse.unquote(url)}")
+                print(f"{Fore.MAGENTA}Description: {Style.BRIGHT}{desc}\n")
+
         print(f"{Fore.YELLOW}{Style.BRIGHT}Execution finished. Total results found: {len(items)}")
 
         if args.output:
