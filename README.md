@@ -54,7 +54,7 @@ See this project in PyPi: [https://pypi.org/project/dumpdork/](https://pypi.org/
 
 ## Configuration
 
-DumpDork stores its configuration in ``~/.config/dumpdork/config.yaml`.
+DumpDork stores its configuration in `~/.config/dumpdork/config.yaml`.
 
 ### The Easy Way (Wizard)
 
