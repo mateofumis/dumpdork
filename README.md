@@ -11,9 +11,7 @@ DumpDork is a powerful command-line tool for performing Google dorking, allowing
 
 ## Features
 
-- **Effortless Querying**: Construct complex search queries with ease using Google's powerful search operators.
-- **Customizable Results**: Specify the number of results to retrieve, with a maximum limit of 300.
-- **Output Options**: Save your findings in a neatly formatted JSON file for further analysis or reporting.
+- **Multi-Engine Support**: Perform searches across **Google**, **Brave**, and **GitHub** from a single interface.
 - **No CAPTCHA Required**: This script does not require users to complete CAPTCHA, making it easier to retrieve results without interruptions.
 - **Configurable Credentials**: Manage your API credentials securely through a simple YAML configuration file.
 - **Interactive Setup Wizard**: With an user-friendly wizard which guides you through the setup process, helping you configure your API credentials settings step-by-step.
@@ -47,28 +45,37 @@ pip3 install -r requirements.txt
 1. Install dumpdork with pip3
 
 ```bash
-pip3 install dumpdork
+$: pip3 install dumpdork
 # or as well with pipx
-pipx install dumpdork
+$: pipx install dumpdork
 ```
 
 See this project in PyPi: [https://pypi.org/project/dumpdork/](https://pypi.org/project/dumpdork/) 
 
-## Configure your API credentials:
+## Configuration
 
-Create config.yaml file in `~/.config/dumpdork/config.yaml` with the following structure:
+DumpDork stores its configuration in ``~/.config/dumpdork/config.yaml`.
+
+### The Easy Way (Wizard)
+
+Simply run the tool with the wizard flag to set up your keys interactively:
+
+```bash
+$: python3 dumpdork.py -w
+```
+
+### Manual Configuration
+
+Create the file with the following structure:
 
 ```yaml
 rapidapi:
   host: google-search74.p.rapidapi.com
-  key: "YOUR_RAPIDAPI_KEY"
+  keys:
+    google: "YOUR_RAPIDAPI_KEY"
+    brave: "YOUR_RAPIDAPI_KEY"
+    github: "YOUR_GITHUB_TOKEN"
 ```
-
-### How to get your credentials
-
-1. Visit [https://rapidapi.com/auth/login/](https://rapidapi.com/auth/login/) and create an account or sign in.
-2. Once logged in, visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and claim your FREE API credentials.
-3. Done! Now you can fill your `config.yaml` with your own credentials.
 
 **[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/blob/main/API_SETUP_GUIDE.md**
 
@@ -76,41 +83,44 @@ rapidapi:
 
 ```
 $: dumpdork
-🔍 Welcome to DumpDork !!
+    ____                        ____             _
+   |  _ \ _   _ _ __ ___  _ __ |  _ \  ___  _ __| | __
+   | | | | | | | '_ ` _ \| '_ \| | | |/ _ \| '__| |/ /
+   | |_| | |_| | | | | | | |_) | |_| | (_) | |  |   <
+   |____/ \__,_|_| |_| |_| .__/|____/ \___/|_|  |_|\_\
+                         |_|
+             Advanced Dorking Tool v1.0
+       Created by: Mateo Fumis (hackermater)
 
-Usage: dumpdork 'query' [--limit number] [--output filename.json] [--config-file config.yaml]
+usage: dumpdork.py [-h] [-s {google,github,brave}] [-l LIMIT] [-o OUTPUT] [-w] [query]
 
-Options:
-  query                 The search query.
-  --limit               Number of results to return (default is 50. Limit: 300).
-  --output              Output file to save results in JSON format.
-  --config-file         Path to custom YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml
-  --wizard              Set up your API key for dumpdork, step by step with easy.
-
-📋 Examples:
-    $: dumpdork 'site:*.example.com AND (intext:"aws_access_key_id" | intext:"aws_secret_access_key" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json
-    $: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:"/login" | inurl:"/signup" | inurl:"/admin" | inurl:"/register") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json
-    $: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
+Use -h or --help for full details.
 ```
 
 Example Queries
 
-- Search for AWS Leaked Credentials:
+- Search for AWS Leaked Credentials (Google):
 
 ```bash
 $: dumpdork 'site:*.example.com AND (intext:"aws_access_key_id" | intext:"aws_secret_access_key" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json
 ```
 
-- Find SQL Injection Endpoints Forms:
+- Find Sensitive Repositories (GitHub):
 
 ```bash
-$: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:"/login" | inurl:"/signup" | inurl:"/admin" | inurl:"/register") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json
+$: dumpdork -s github "filename:config.php 'DB_PASSWORD'"
 ```
 
-- Search for Sensitive Files or Logs:
+- Search via Brave Search:
 
 ```bash
-$: dumpdork 'site:*.example.com AND (intitle:"Index of /" | intitle:"index of") AND (intext:".log" | intext:".sql" | intext:".txt" | intext:".sh")' --config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json
+$: dumpdork -s brave "inurl:admin login"
+```
+
+- Save Results to JSON:
+
+```bash
+$: dumpdork "sensitive data" -o results.json
 ```
 
 - Take a look at **GHDB** for more Dorks: [https://www.exploit-db.com/google-hacking-database](https://www.exploit-db.com/google-hacking-database)
