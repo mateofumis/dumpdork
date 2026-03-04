@@ -13,126 +13,200 @@ init(autoreset=True)
 
 CONFIG_DIR = os.path.expanduser("~/.config/dumpdork")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.yaml")
-HOST = "google-search74.p.rapidapi.com"
+
+PROVIDERS = {
+    "google": {
+        "host": "google-search74.p.rapidapi.com",
+        "url_pattern": "https://google-search74.p.rapidapi.com/"
+    },
+    "brave": {
+        "host": "brave-web-search.p.rapidapi.com",
+        "url_pattern": "https://brave-web-search.p.rapidapi.com/search"
+    },
+    "github": {
+        "is_official": True,
+        "url_pattern": "https://api.github.com/search/repositories"
+    }
+}
+
+def print_banner():
+    banner = rf"""
+{Fore.CYAN}    ____                        ____             _    
+{Fore.CYAN}   |  _ \ _   _ _ __ ___  _ __ |  _ \  ___  _ __| | __
+{Fore.CYAN}   | | | | | | | '_ ` _ \| '_ \| | | |/ _ \| '__| |/ /
+{Fore.CYAN}   | |_| | |_| | | | | | | |_) | |_| | (_) | |  |   < 
+{Fore.CYAN}   |____/ \__,_|_| |_| |_| .__/|____/ \___/|_|  |_|\_\
+{Fore.CYAN}                         |_|                          
+{Fore.YELLOW}             Advanced Dorking Tool v1.0
+{Fore.WHITE}       Created by: Mateo Fumis (hackermater)
+    """
+    print(banner)
 
 def load_config(config_file):
     try:
         with open(config_file, 'r') as file:
             return yaml.safe_load(file)
     except FileNotFoundError:
-        print(f"{Fore.RED}Error: Configuration file '{config_file}' not found or is empty.")
+        print(f"{Fore.RED}Error: Configuration file '{config_file}' not found.")
+        print(f"{Fore.YELLOW}Tip: Run with -w to set up your API keys.")
         sys.exit(1)
     except yaml.YAMLError as e:
         print(f"{Fore.RED}Error: Failed to parse configuration file. {e}")
         sys.exit(1)
 
-def save_config(config_file, key):
+def save_config(config_file, keys_dict):
     os.makedirs(CONFIG_DIR, exist_ok=True)
     config = {
         'rapidapi': {
-            'host': HOST,
-            'key': key
+            'host': PROVIDERS["google"]["host"],
+            'keys': keys_dict
         }
     }
     with open(config_file, 'w') as file:
-        yaml.dump(config, file)
+        yaml.dump(config, file, default_flow_style=False)
     print(f"{Fore.GREEN}Configuration saved to '{config_file}'")
 
-def rapidapi_search(query, limit, key):
-    encoded_query = urllib.parse.quote(query)
-
-    url = f"https://{HOST}/?query={encoded_query}&limit={limit}&related_keywords=true"
-
-    headers = {
-        'x-rapidapi-host': HOST,
-        'x-rapidapi-key': key,
-        'Content-Type': "application/json"
-    }
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
-        return response
-    else:
-        print(f"{Fore.RED}Error: {response.status_code}")
+def perform_search(source, query, limit, key):
+    if source not in PROVIDERS:
         return None
 
-def print_help():
-    print("🔍 Welcome to DumpDork !!")
-    print("\nUsage: dumpdork 'query' [--limit number] [--output filename.json] [--config-file config.yaml]")
-    print("\nOptions:")
-    print("  query                 The search query.")
-    print("  --limit               Number of results to return (default is 50. Limit: 300).")
-    print("  --output              Output file to save results in JSON format.")
-    print("  --config-file         Path to custom YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml")
-    print("  --wizard              Set up your API key for dumpdork, step by step with easy.")
-    print("\n📋 Examples:")
-    print("    $: dumpdork 'site:*.example.com AND (intext:\"aws_access_key_id\" | intext:\"aws_secret_access_key\" filetype:json | filetype:yaml) ' --limit 200 --output aws_credentials.json ")
-    print("    $: dumpdork '(site:*.example.com AND -site:docs.example.com) AND (inurl:\"/login\" | inurl:\"/signup\" | inurl:\"/admin\" | inurl:\"/register\") AND (ext:php | ext:aspx)' --limit 300 --output sqli_forms.json")
-    print("    $: dumpdork 'site:*.example.com AND (intitle:\"Index of /\" | intitle:\"index of\") AND (intext:\".log\" | intext:\".sql\" | intext:\".txt\" | intext:\".sh\")' --config-file ~/.config/dumpdork/config_files/credentials_01.yaml --output sensitive_files.json")
+    provider = PROVIDERS[source]
+    headers = {}
+    params = {}
+
+    if source == "github":
+        url = provider["url_pattern"]
+        params = {'q': query, 'per_page': limit}
+        if key and key.strip() != "" and key != "Not configured":
+            headers['Authorization'] = f"token {key}"
+        headers['Accept'] = "application/vnd.github.v3+json"
+        headers['User-Agent'] = 'DumpDork-Tool'
+        
+    elif source == "google":
+        url = provider["url_pattern"]
+        params = {'query': query, 'limit': limit}
+        headers = {
+            'x-rapidapi-host': provider["host"],
+            'x-rapidapi-key': key
+        }
+
+    elif source == "brave":
+        url = provider["url_pattern"]
+        params = {'q': query, 'count': limit}
+        headers = {
+            'x-rapidapi-host': provider["host"],
+            'x-rapidapi-key': key
+        }
+    
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 401:
+            print(f"{Fore.RED}Error 401: Unauthorized. Your {source} token/key is invalid.")
+        elif response.status_code == 403:
+            print(f"{Fore.RED}Error 403: Forbidden for {source}.")
+        else:
+            print(f"{Fore.RED}Error {response.status_code} from {source}")
+    except Exception as e:
+        print(f"{Fore.RED}Connection Error: {e}")
+    return None
 
 def wizard_setup():
-    print(f"{Fore.YELLOW}Welcome to the API Key Setup Wizard!")
-    print(f"\033[1m[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/blob/main/API_SETUP_GUIDE.md")
-    print("1. Sign up at: https://rapidapi.com/herosAPI/api/google-search74/playground")
-    print("2. Subscribe for free and copy the API key.")
+    print(f"{Fore.YELLOW}{Style.BRIGHT}Welcome to the DumpDork API Setup Wizard!")
+    
+    keys_dict = {}
+    if os.path.exists(CONFIG_FILE):
+        try:
+            existing_config = load_config(CONFIG_FILE)
+            keys_dict = existing_config.get('rapidapi', {}).get('keys', {})
+        except:
+            pass
 
-    key = input(f"\033[1mEnter your RapidAPI key: ").strip()
-    if not key:
-        print(f"{Fore.RED}Error: API key cannot be empty.")
-        sys.exit(1)
-
-    save_config(CONFIG_FILE, key)
+    for source in PROVIDERS.keys():
+        print(f"\n{Fore.CYAN}--- {source.upper()} ---")
+        if source == "github":
+            print("Using official GitHub API (api.github.com)")
+        else:
+            print(f"RapidAPI Host: {PROVIDERS[source]['host']}")
+        
+        current_key = keys_dict.get(source, "Not configured")
+        print(f"Current Key: {current_key}")
+        
+        prompt = f"Enter API key/token for {source} (leave blank to skip): "
+        new_key = input(prompt).strip()
+        
+        if new_key.lower() == 'clear':
+            keys_dict[source] = ""
+        elif new_key:
+            keys_dict[source] = new_key
+    
+    save_config(CONFIG_FILE, keys_dict)
 
 def main():
-    parser = argparse.ArgumentParser(description='Perform a search using Google Dorks')
-    parser.add_argument('query', nargs='?', type=str, help='The search query.')
-    parser.add_argument('--limit', type=int, default=50, help='Number of results to return (default is 50. Limit: 300).')
-    parser.add_argument('--output', type=str, help='Output file to save results in JSON format.')
-    parser.add_argument('--config-file', type=str, default=CONFIG_FILE, help='Path to the YAML config file containing API credentials. Default is: ~/.config/dumpdork/config.yaml')
-    parser.add_argument('--wizard', action='store_true', help='Set up your API key for dumpdork, step by step with easy.')
+    parser = argparse.ArgumentParser(description='Perform a search using Dorks across multiple platforms', prog='dumpdork.py')
+    parser.add_argument('query', nargs='?', type=str, help='Search query or dork')
+    parser.add_argument('-s', '--source', type=str, default='google', choices=['google', 'github', 'brave'], help='Search engine source')
+    parser.add_argument('-l', '--limit', type=int, default=50, help='Maximum number of results')
+    parser.add_argument('-o', '--output', type=str, help='Save results to a JSON file')
+    parser.add_argument('-w', '--wizard', action='store_true', help='Run API configuration wizard')
+
+    print_banner()
+
+    if len(sys.argv) == 1:
+        parser.print_usage()
+        print(f"\nUse {Fore.YELLOW}-h{Fore.RESET} or {Fore.YELLOW}--help{Fore.RESET} for full details.\n")
+        sys.exit(0)
 
     args = parser.parse_args()
-
-    if args.limit > 300:
-        print(f"{Fore.RED}Error: Maximum limit allowed for the API is 300.")
-        sys.exit(1)
 
     if args.wizard:
         wizard_setup()
         sys.exit(0)
 
     if args.query is None:
-        print_help()
+        parser.print_usage()
+        print(f"{Fore.RED}Error: A search query is required unless using -w.")
         sys.exit(1)
 
-    config = load_config(args.config_file)
-    key = config['rapidapi']['key']
+    config = load_config(CONFIG_FILE)
+    keys_dict = config.get('rapidapi', {}).get('keys', {})
+    api_key = keys_dict.get(args.source)
 
-    response = rapidapi_search(args.query, args.limit, key)
+    if not api_key and args.source != "github":
+        print(f"{Fore.RED}Error: No API key found for {args.source}. Run with -w to setup.")
+        sys.exit(1)
 
-    if response:
-        results = response.json()
-        items = results.get('results', [])
+    print(f"{Fore.YELLOW}Searching {args.source} for: {args.query}...\n")
+    results = perform_search(args.source, args.query, args.limit, api_key)
+
+    if results:
+        items = []
+        if args.source == "brave":
+            items = results.get('results', []) or results.get('web', {}).get('results', [])
+        elif args.source == "github":
+            items = results.get('items', [])
+        else: # Google
+            items = results.get('results', [])
+
         for item in items:
-            title = item.get('title', 'No Title')
-            url = urllib.parse.unquote(item.get('url', 'No URL'))
-            description = item.get('description', 'No Description')
+            title = item.get('title') or item.get('full_name') or 'No Title'
+            url = item.get('url') or item.get('html_url') or item.get('link') or 'No URL'
+            desc = item.get('description') or item.get('snippet') or 'No Description'
 
             print(f"{Fore.CYAN}Title: {Style.BRIGHT}{title}")
-            print(f"{Fore.GREEN}URL: {Style.BRIGHT}{url}")
-            print(f"{Fore.MAGENTA}Description: {Style.BRIGHT}{description}\n")
+            print(f"{Fore.GREEN}URL: {Style.BRIGHT}{urllib.parse.unquote(url)}")
+            print(f"{Fore.MAGENTA}Description: {Style.BRIGHT}{desc}\n")
+        
+        print(f"{Fore.YELLOW}{Style.BRIGHT}Execution finished. Total results found: {len(items)}")
 
-        total_results = len(items)
-        print(f"{Fore.YELLOW}Total results: {total_results}")
-
+        if args.output:
+            with open(args.output, 'w', encoding='utf-8') as json_file:
+                json.dump(results, json_file, ensure_ascii=False, indent=4)
+            print(f"{Fore.YELLOW}Results saved to '{args.output}'")
     else:
-        print(f"{Fore.RED}No results found or an error occurred.")
-
-    if args.output:
-        with open(args.output, 'w', encoding='utf-8') as json_file:
-            json.dump(response.json(), json_file, ensure_ascii=False, indent=4)
-        print(f"{Fore.YELLOW}Results saved to '{args.output}'")
+        print(f"{Fore.RED}No results found.")
+        print(f"{Fore.YELLOW}{Style.BRIGHT}Execution finished. Total results found: 0")
 
 if __name__ == "__main__":
     main()

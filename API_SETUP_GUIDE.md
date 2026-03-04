@@ -1,27 +1,58 @@
-# API Setup Guide
+# **DumpDork API Setup Guide**
 
-1. Visit [https://rapidapi.com/auth/login/](https://rapidapi.com/auth/login/) and Sign up (or Log In).
-2. Visit [https://rapidapi.com/herosAPI/api/google-search74/playground](https://rapidapi.com/herosAPI/api/google-search74/playground) and:
-   1. Click on `Subscribe to Test`
-   2. Copy your API key and save it to then put it in your `config.yaml`.
-   4. Click on `Start Free Plan`
-   5. Click on `Subscribe`
+This guide will help you obtain the necessary API keys and tokens to use with **DumpDork**.
 
-**Follow the instructions on the following screenshots, step by step:**
+## **1. Google & Brave (RapidAPI)**
 
-![1_claim-api-key](https://github.com/user-attachments/assets/a5d1a7fd-32c1-4b04-a8ef-8bf993435c49)
-![2_start-free-plan](https://github.com/user-attachments/assets/f5a9433d-71f7-40f1-be2e-cb6cca0d7841)
-![3_final-step-subscribe](https://github.com/user-attachments/assets/48edde9e-7764-411c-9a43-279798f0d691)
+Both Google and Brave search providers in this tool are powered by **RapidAPI**.
 
----
+1. **Create an Account:** Go to [RapidAPI.com](https://rapidapi.com/auth/sign-up) and sign up.  
+2. **Subscribe to the APIs:**  
+   * **Google:** Go to the [Google Search74 API](https://rapidapi.com/herosAPI/api/google-search74/playground) page.  
+   * **Brave:** Go to the [Brave Web Search API](https://rapidapi.com/rainapi-rainapi-default/api/brave-web-search/playground/) page.  
+3. **Select a Plan:** Both offer a "Basic" (Free) tier with a limited number of requests per month.  
+4. **Get Your Key:** Once subscribed, go to the "Endpoints" tab in the RapidAPI playground. Look for the `x-rapidapi-key` header in the code snippets. This key is the same for all APIs on your RapidAPI account.
 
-3. Additionally, **DumpDork** has the feature `--wizard`. Use `dumpdork --wizard` 
+## **2. GitHub (Personal Access Token)**
+
+The GitHub provider uses official GitHub APIs. While it can work without a token for very limited requests, a token is highly recommended to avoid rate limits.
+
+1. **Log in to GitHub:** Go to [GitHub.com](https://github.com/).  
+2. **Settings:** Click your profile picture -> **Settings**.  
+3. **Developer Settings:** On the left sidebar, click **Developer settings** (at the bottom).  
+4. **Personal Access Tokens:** Click **Tokens (classic)**.  
+5. **Generate Token:** Click **Generate new token (classic)**.  
+6. **Scopes:** For dorking public repositories, you don't need to select any specific scopes. If you want to dork your private repositories, select repo.  
+7. **Copy Token:** Copy the token immediately. You won't be able to see it again.
+
+## **3. Configuring DumpDork**
+
+Once you have your keys, run the DumpDork setup wizard:
 
 ```bash
-$: dumpdork --wizard
-Welcome to the API Key Setup Wizard!
-[*] See detailed instructions at: https://github.com/mateofumis/dumpdork/blob/main/API_SETUP_GUIDE.md
-1. Signup at: https://rapidapi.com/herosAPI/api/google-search74/playground
-2. Subscribe for free and copy the API key.
-Enter your RapidAPI key:
+python3 dumpdork.py -w
+```
+
+The wizard will prompt you for each key.
+
+* **RapidAPI Key:** Enter your key when prompted for Google and Brave.  
+* **GitHub Token:** Paste your Personal Access Token when prompted for GitHub.
+
+### **Manual Configuration**
+
+If you prefer to edit the file manually, the configuration is stored in YAML format at:
+
+```
+~/.config/dumpdork/config.yaml
+```
+
+Example structure:
+
+```yaml
+rapidapi:  
+  host: google-search74.p.rapidapi.com  
+  keys:  
+    google: "your_rapidapi_key_here"  
+    brave: "your_rapidapi_key_here"  
+    github: "your_github_token_here"  
 ```

@@ -1,3 +1,6 @@
-rapidapi:
-  host: google-search74.p.rapidapi.com
-  key: "YOUR_RAPIDAPI_KEY"
+rapidapi:  
+  host: google-search74.p.rapidapi.com  
+  keys:  
+    google: "your_rapidapi_key_here"  
+    brave: "your_rapidapi_key_here"  
+    github: "your_github_token_here"  
