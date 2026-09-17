@@ -1,6 +1,6 @@
 # DumpDork
 
-<img alt="logo_banner" src="https://raw.githubusercontent.com/mateofumis/dumpdork/refs/heads/main/assets/dumpdork.png" />
+<img alt="logo_banner" src="https://raw.githubusercontent.com/mateofumis/dumpdork/refs/heads/main/dumpdork.png" />
 
 ---
 
