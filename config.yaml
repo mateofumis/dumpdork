@@ -1,6 +1,5 @@
-rapidapi:  
-  host: google-search74.p.rapidapi.com  
-  keys:  
-    google: "your_rapidapi_key_here"  
-    brave: "your_rapidapi_key_here"  
-    github: "your_github_token_here"  
+# Example only: the CLI reads ~/.config/dumpdork/config.yaml, not this file.
+# Never commit real API credentials.
+credentials:
+  brave_key: ""
+  github_token: ""

@@ -1,3 +1,5 @@
-# dumpdork/__init__.py
+"""DumpDork search-driven OSINT tools."""
 
-from .main import main
+from .cli import main
+
+__all__ = ["main"]

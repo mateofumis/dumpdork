@@ -1,58 +1,38 @@
-# **DumpDork API Setup Guide**
+# DumpDork API setup
 
-This guide will help you obtain the necessary API keys and tokens to use with **DumpDork**.
+DumpDork uses the official [Brave Search API](https://api-dashboard.search.brave.com/api-reference/web/search/get) for web/news/image/video search and the [GitHub REST search API](https://docs.github.com/en/rest/search/search) for GitHub search.
 
-## **1. Google & Brave (RapidAPI)**
+## Brave
 
-Both Google and Brave search providers in this tool are powered by **RapidAPI**.
-
-1. **Create an Account:** Go to [RapidAPI.com](https://rapidapi.com/auth/sign-up) and sign up.  
-2. **Subscribe to the APIs:**  
-   * **Google:** Go to the [Google Search74 API](https://rapidapi.com/herosAPI/api/google-search74/playground) page.  
-   * **Brave:** Go to the [Brave Web Search API](https://rapidapi.com/rainapi-rainapi-default/api/brave-web-search/playground/) page.  
-3. **Select a Plan:** Both offer a "Basic" (Free) tier with a limited number of requests per month.  
-4. **Get Your Key:** Once subscribed, go to the "Endpoints" tab in the RapidAPI playground. Look for the `x-rapidapi-key` header in the code snippets. This key is the same for all APIs on your RapidAPI account.
-
-## **2. GitHub (Personal Access Token)**
-
-The GitHub provider uses official GitHub APIs. While it can work without a token for very limited requests, a token is highly recommended to avoid rate limits.
-
-1. **Log in to GitHub:** Go to [GitHub.com](https://github.com/).  
-2. **Settings:** Click your profile picture -> **Settings**.  
-3. **Developer Settings:** On the left sidebar, click **Developer settings** (at the bottom).  
-4. **Personal Access Tokens:** Click **Tokens (classic)**.  
-5. **Generate Token:** Click **Generate new token (classic)**.  
-6. **Scopes:** For dorking public repositories, you don't need to select any specific scopes. If you want to dork your private repositories, select repo.  
-7. **Copy Token:** Copy the token immediately. You won't be able to see it again.
-
-## **3. Configuring DumpDork**
-
-Once you have your keys, run the DumpDork setup wizard:
+Create a Brave Search API account and a key in the Brave dashboard. Set it in your environment or use the private wizard:
 
 ```bash
-python3 dumpdork.py -w
+export BRAVE_API_KEY='your-brave-key'
+dumpdork -w
 ```
 
-The wizard will prompt you for each key.
+The key is sent only in Brave's `X-Subscription-Token` request header, not a query parameter. Search operators such as `site:`, `filetype:`, `inbody:`, and `intitle:` are passed through. Use `dumpdork -h` to see all named `--brave-*` filters and headers; unsupported options for a selected vertical are rejected locally. Brave fetches one page by default, even with a high `-l`; use `--brave-paginate -l N` to allow multiple API requests. Brave's short-window rate-limit headers are respected between requests; failed requests are not retried. See [Brave's rate-limit guide](https://api-dashboard.search.brave.com/documentation/guides/rate-limiting).
 
-* **RapidAPI Key:** Enter your key when prompted for Google and Brave.  
-* **GitHub Token:** Paste your Personal Access Token when prompted for GitHub.
+Brave may require an eligible plan for optional features such as rich callback hints.
 
-### **Manual Configuration**
+## GitHub
 
-If you prefer to edit the file manually, the configuration is stored in YAML format at:
+Create a GitHub personal access token from GitHub settings if you need code search or higher limits. For public search, use the least permissions needed:
 
+```bash
+export GITHUB_TOKEN='your-github-token'
 ```
-~/.config/dumpdork/config.yaml
-```
 
-Example structure:
+Repository search can run anonymously. DumpDork requires a token for code search, selected with `--github-type code`. GitHub's [REST search limits](https://docs.github.com/en/rest/search/search) are stricter for code search.
+
+## Private config file
+
+`dumpdork -w` prompts without echoing values and saves `~/.config/dumpdork/config.yaml` with owner-only permissions on POSIX systems:
 
 ```yaml
-rapidapi:  
-  host: google-search74.p.rapidapi.com  
-  keys:  
-    google: "your_rapidapi_key_here"  
-    brave: "your_rapidapi_key_here"  
-    github: "your_github_token_here"  
+credentials:
+  brave_key: "your-brave-key"
+  github_token: "your-github-token"
 ```
+
+Environment variables override this file. Do not put real credentials in the repository's example `config.yaml` or shell commands saved in history. If you used an older DumpDork config, a GitHub token stored under `rapidapi.keys.github` in this private file still works. To save it in the new format, run `dumpdork -w` and leave the GitHub token prompt blank; the wizard will keep the token and write it under `credentials.github_token`. Old RapidAPI search keys are not used.

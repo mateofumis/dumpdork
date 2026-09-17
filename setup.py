@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='dumpdork',
-    version='1.2.0',
+    version='2.0.0',
     packages=find_packages(),
     install_requires=[
         'colorama==0.4.6',
-        'PyYAML==6.0.1',
+        'PyYAML==6.0.2',
         'requests==2.32.3',
     ],
     entry_points={
@@ -14,8 +14,8 @@ setup(
             'dumpdork=dumpdork:main',
         ],
     },
-    description='A powerful command-line tool for Google dorking, enabling users to uncover hidden information and vulnerabilities with advanced search queries.',
-    long_description=open('README.md').read(),
+    description='A small, search-driven OSINT and reconnaissance command-line framework.',
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/mateofumis/dumpdork',
     author='Mateo Fumis',
@@ -25,5 +25,5 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.11',
 )
